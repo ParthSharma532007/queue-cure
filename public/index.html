@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinic Live Queue — Waiting Room</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="glass-card" style="padding: 1.25rem 2rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+    <div class="logo-container">
+      <div class="logo-icon">🏥</div>
+      <div class="logo-text">
+        <h1>Care Clinic</h1>
+        <p>Live Waiting Room Display</p>
+      </div>
+    </div>
+    <div class="status-indicator">
+      <span class="status-dot active"></span>
+      <span id="connection-status">Connecting to clinic server...</span>
+    </div>
+  </header>
+
+  <div class="patient-layout">
+    <!-- Left Column: Serving Banner and Main Info -->
+    <div class="main-screen">
+      <!-- Giant Now Serving Banner -->
+      <div class="serving-banner">
+        <div class="serving-label">Now Serving</div>
+        <div id="serving-display">
+          <div class="empty-serving">No patient is currently active in the cabin</div>
+        </div>
+      </div>
+
+      <!-- Live Waiting List -->
+      <div class="glass-card queue-list-card">
+        <div class="queue-title">
+          <h2 style="font-weight: 700; color: var(--primary);">Upcoming Queue Board</h2>
+          <span class="queue-count-badge" id="queue-badge">0 Patients Waiting</span>
+        </div>
+        
+        <div class="queue-table-container">
+          <table class="queue-table">
+            <thead>
+              <tr>
+                <th style="width: 100px;">Token</th>
+                <th>Patient Name</th>
+                <th>Estimated Waiting Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="patient-queue-body">
+              <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                  Clinic queue is currently empty.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Personalized Wait Status Lookup -->
+    <div class="receptionist-sidebar">
+      
+      <!-- Patient Check-In Status Lookup -->
+      <div class="glass-card lookup-card">
+        <h2 style="font-weight: 700; margin-bottom: 0.5rem; color: var(--primary);">Personal Status Tracker</h2>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+          Select your token number to view your real-time position and custom wait estimation.
+        </p>
+        
+        <div class="form-group">
+          <label for="my-token-select">Select Your Token</label>
+          <select id="my-token-select" class="input-control">
+            <option value="">-- Choose Token --</option>
+          </select>
+        </div>
+
+        <div id="personal-result" style="display: none;">
+          <div class="personal-status-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="personal-token-badge" id="p-token-badge">Token #00</span>
+              <span id="p-status-badge" style="font-weight: 700; font-size: 0.85rem; text-transform: uppercase;">In Queue</span>
+            </div>
+            
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;" id="p-welcome-name">Hi Patient</h3>
+            
+            <!-- Position Indicator -->
+            <div style="margin: 1rem 0; font-size: 0.95rem;">
+              <p id="p-position-info">Loading position...</p>
+              <p style="margin-top: 0.25rem; font-weight: 700; color: var(--primary);" id="p-time-info">Estimated Wait: Loading...</p>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic; margin-top: 0.25rem;" id="p-clock-info"></p>
+            </div>
+
+            <!-- Stepper Visualizer -->
+            <div class="status-steps">
+              <div class="step" id="step-queue">
+                <div class="step-dot">1</div>
+                <span>In Queue</span>
+              </div>
+              <div class="step" id="step-next">
+                <div class="step-dot">2</div>
+                <span>Next Up</span>
+              </div>
+              <div class="step" id="step-cabin">
+                <div class="step-dot">3</div>
+                <span>In Cabin</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Voice and Audio Controls -->
+      <div class="glass-card">
+        <h3 style="font-weight: 700; margin-bottom: 0.5rem; color: var(--primary);">Waiting Room Sound</h3>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+          Enable live announcements so patients don't need to stare at the screen or listen for shouting.
+        </p>
+        
+        <div class="voice-settings">
+          <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);">🗣️ Voice Announcement & Chime</span>
+          <label class="switch">
+            <input type="checkbox" id="voice-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.75rem; text-align: center;">
+          Note: Turn your device volume up. Utilizes high-quality localized voice synthesis.
+        </p>
+      </div>
+
+      <!-- Real Data info explanation card -->
+      <div class="glass-card" style="background: rgba(3, 105, 161, 0.05); border-color: rgba(3, 105, 161, 0.2);">
+        <h4 style="font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem;">How wait times are computed</h4>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+          Estimates are calculated using a rolling average of actual consultation times from today's patients. If the doctor moves faster, the wait times adapt dynamically!
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="patient.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "clinic-queue-manager",
+  "version": "1.0.0",
+  "description": "Live digital queue manager for a neighborhood clinic",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Queue Cure — Receptionist Console</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="glass-card" style="padding: 1.25rem 2rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+    <div class="logo-container">
+      <div class="logo-icon">➕</div>
+      <div class="logo-text">
+        <h1>Queue Cure</h1>
+        <p>Receptionist Console</p>
+      </div>
+    </div>
+    <div class="status-indicator">
+      <span class="status-dot active"></span>
+      <span id="connection-status">Connecting to Live Server...</span>
+    </div>
+  </header>
+
+  <!-- Key Performance Metrics -->
+  <div class="stats-grid">
+    <div class="glass-card stat-card">
+      <div class="stat-label">Currently Serving</div>
+      <div class="stat-value" id="stat-serving" style="color: var(--success-dark);">-</div>
+    </div>
+    <div class="glass-card stat-card">
+      <div class="stat-label">Patients Waiting</div>
+      <div class="stat-value" id="stat-waiting">0</div>
+    </div>
+    <div class="glass-card stat-card">
+      <div class="stat-label">Estimated Wait Rate</div>
+      <div class="stat-value" id="stat-avg-time">10m</div>
+    </div>
+    <div class="glass-card stat-card">
+      <div class="stat-label">Served Today</div>
+      <div class="stat-value" id="stat-completed" style="color: var(--secondary);">0</div>
+    </div>
+  </div>
+
+  <div class="receptionist-layout">
+    <!-- Left Column: Intake and Session Settings -->
+    <div class="receptionist-sidebar">
+      
+      <!-- Patient Intake Form -->
+      <div class="glass-card">
+        <h2 style="font-weight: 700; margin-bottom: 1.25rem; color: var(--primary);">Patient Intake</h2>
+        <form id="intake-form" onsubmit="event.preventDefault();">
+          <div class="form-group">
+            <label for="patient-name">Patient Full Name</label>
+            <input type="text" id="patient-name" class="input-control" placeholder="Type name and press Enter..." autocomplete="off" required>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">⚡ Quick Tip: Type name and hit <strong>Enter</strong> to instantly assign a token in &lt; 1 second.</p>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Add to Queue (Enter)</button>
+        </form>
+      </div>
+
+      <!-- Quick Control Center -->
+      <div class="glass-card quick-call-section">
+        <h2 style="font-weight: 700; margin-bottom: 0.5rem; color: var(--primary);">Doctor Controls</h2>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">Direct commands to update the active patient cabin</p>
+        
+        <div class="current-card">
+          <div class="current-card-title">Serving Now</div>
+          <div class="current-card-token" id="active-token">-</div>
+          <div class="current-card-name" id="active-name">No Patient Active</div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+          <button id="btn-call-next" class="btn btn-success" style="width: 100%; font-size: 1.1rem; padding: 1.1rem 1.5rem;">
+            🔔 Call Next Patient
+          </button>
+          <div class="btn-group">
+            <button id="btn-recall" class="btn btn-secondary" style="flex: 1;">📢 Recall Again</button>
+            <button id="btn-no-show" class="btn btn-secondary" style="flex: 1; border-color: rgba(239, 68, 68, 0.2); color: var(--danger);">Mark No-Show</button>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.25rem;">
+            Keyboard shortcut: Press <strong>Ctrl + Shift + Space</strong> to call the next patient.
+          </p>
+        </div>
+      </div>
+
+      <!-- Configuration Settings -->
+      <div class="glass-card">
+        <h2 style="font-weight: 700; margin-bottom: 1.25rem; color: var(--primary);">Session Config</h2>
+        <div class="form-group">
+          <label style="display: flex; justify-content: space-between;">
+            <span>Target Consultation Time</span>
+            <span id="slider-val" style="color: var(--primary); font-weight: 700;">10 mins</span>
+          </label>
+          <div class="slider-container">
+            <input type="range" id="consultation-slider" min="2" max="30" value="10">
+            <div class="slider-labels">
+              <span>2m</span>
+              <span>15m</span>
+              <span>30m</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="background: rgba(15, 118, 110, 0.05); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(15, 118, 110, 0.1); margin-bottom: 1rem;">
+          <h4 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--primary);">Real Data Engine Status:</h4>
+          <p id="engine-status" style="font-size: 0.85rem; color: var(--text-secondary);">Using manual default target.</p>
+        </div>
+
+        <button id="btn-reset" class="btn btn-secondary" style="width: 100%; border-color: rgba(239, 68, 68, 0.4); color: var(--danger); font-size: 0.9rem;">
+          🧹 Reset Daily Queue Session
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Live Queue Directory -->
+    <div class="glass-card queue-list-card">
+      <div class="queue-title">
+        <h2 style="font-weight: 700; color: var(--primary);">Waiting Directory</h2>
+        <span class="queue-count-badge" id="queue-count">0 waiting</span>
+      </div>
+
+      <div class="queue-table-container">
+        <table class="queue-table">
+          <thead>
+            <tr>
+              <th style="width: 80px;">Token</th>
+              <th>Patient Name</th>
+              <th>Check-in</th>
+              <th>Est. Wait</th>
+              <th style="width: 140px; text-align: center;">Order</th>
+              <th style="width: 60px; text-align: center;">Cancel</th>
+            </tr>
+          </thead>
+          <tbody id="queue-body">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                No patients in queue. Type a name above to add.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="receptionist.js"></script>
+</body>
+</html>
