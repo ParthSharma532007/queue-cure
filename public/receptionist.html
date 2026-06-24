@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="glass-card" style="padding: 1.25rem 2rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+  <header class="glass-card" style="padding: 1.25rem 2rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
     <div class="logo-container">
       <div class="logo-icon">➕</div>
       <div class="logo-text">
@@ -15,9 +15,16 @@
         <p>Receptionist Console</p>
       </div>
     </div>
-    <div class="status-indicator">
-      <span class="status-dot active"></span>
-      <span id="connection-status">Connecting to Live Server...</span>
+    <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+      <!-- Toggle Switch Tabs Group -->
+      <div style="display: flex; background: rgba(15, 118, 110, 0.08); padding: 4px; border-radius: 50px; border: 1px solid rgba(15, 118, 110, 0.15); align-items: center;">
+        <a href="receptionist.html" style="text-decoration: none; padding: 0.5rem 1.2rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; transition: var(--transition-smooth); background: var(--primary); color: white;">Receptionist</a>
+        <a href="index.html" style="text-decoration: none; padding: 0.5rem 1.2rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; transition: var(--transition-smooth); color: var(--primary); opacity: 0.8;">Patient Room</a>
+      </div>
+      <div class="status-indicator">
+        <span class="status-dot active"></span>
+        <span id="connection-status">Connecting to Live Server...</span>
+      </div>
     </div>
   </header>
 

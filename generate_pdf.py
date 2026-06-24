@@ -5,7 +5,6 @@ class CaseStudyPDF(FPDF):
         # Header text
         self.set_font('helvetica', 'B', 10)
         self.set_text_color(15, 118, 110) # Teal accent color
-        # Replaced em-dash with standard hyphen
         self.cell(0, 10, 'Queue Cure Case Study - Hackathon Submission', border=0, ln=1, align='R')
         self.line(10, 18, 200, 18)
         self.ln(5)
@@ -21,6 +20,8 @@ class CaseStudyPDF(FPDF):
 def create_case_study():
     pdf = CaseStudyPDF()
     pdf.alias_nb_pages()
+    
+    # ==================== PAGE 1 ====================
     pdf.add_page()
     
     # Title
@@ -74,96 +75,109 @@ def create_case_study():
     pdf.set_text_color(15, 118, 110)
     pdf.cell(0, 10, '2. Solution & Key Features', ln=1)
     
-    pdf.set_font('helvetica', 'B', 11)
-    pdf.set_text_color(71, 85, 105)
-    pdf.cell(0, 6, 'A. Ultra-Fast Receptionist Dashboard:', ln=1)
-    pdf.set_font('helvetica', '', 11)
-    pdf.set_text_color(15, 23, 42)
-    dashboard_text = (
-        "Allows a receptionist to check in a patient, assign a sequential token, and broadcast "
-        "updates to the entire waiting room in less than 2 seconds. The interface is optimized "
-        "for extreme speed with auto-focus inputs and keyboard shortcuts (Ctrl+Shift+Space to Call Next)."
-    )
-    pdf.multi_cell(0, 6, dashboard_text)
-    pdf.ln(3)
-    
-    pdf.set_font('helvetica', 'B', 11)
-    pdf.set_text_color(71, 85, 105)
-    pdf.cell(0, 6, 'B. Refresh-Free Patient waiting room display:', ln=1)
-    pdf.set_font('helvetica', '', 11)
-    pdf.set_text_color(15, 23, 42)
-    display_text = (
-        "A highly visual client-facing display showing the token currently being served, upcoming "
-        "waiting lists, and personalized waiting status cards. It updates immediately without refreshing "
-        "when actions are taken on the receptionist side."
-    )
-    pdf.multi_cell(0, 6, display_text)
-    pdf.ln(3)
-    
-    pdf.set_font('helvetica', 'B', 11)
-    pdf.set_text_color(71, 85, 105)
-    pdf.cell(0, 6, 'C. Real-Data Wait Estimation Engine:', ln=1)
-    pdf.set_font('helvetica', '', 11)
-    pdf.set_text_color(15, 23, 42)
-    engine_text = (
-        "Unlike hardcoded guesses, the estimated wait times are computed dynamically by taking a "
-        "rolling average of the last 5 completed consultations (measuring timestamps between consecutively "
-        "called tokens) and factoring in time spent by the current active patient."
-    )
-    pdf.multi_cell(0, 6, engine_text)
-    pdf.ln(3)
-
-    pdf.set_font('helvetica', 'B', 11)
-    pdf.set_text_color(71, 85, 105)
-    pdf.cell(0, 6, 'D. Audio chimes & Text-to-Speech callouts:', ln=1)
-    pdf.set_font('helvetica', '', 11)
-    pdf.set_text_color(15, 23, 42)
-    audio_text = (
-        "Replaces loud waiting-room shouting with automated voice announcements. Utilizing "
-        "the browser's SpeechSynthesis and Web Audio APIs, the patient wait-board chimes and speaks "
-        "the called token number and patient name aloud instantly."
-    )
-    pdf.multi_cell(0, 6, audio_text)
+    features = [
+        ("Ultra-Fast Receptionist Console: ", "Intake a patient, assign a token, and sync waiting rooms in <2s with auto-focused fields and keyboard shortcuts."),
+        ("Refresh-Free Patient Board: ", "A public waiting room display showing current serving tokens, upcoming waiting lists, and active status indicators."),
+        ("Real-Data Estimation Engine: ", "Calculates wait times dynamically using a rolling average of actual consultation durations instead of static guesses."),
+        ("Auto Audio Callouts & Chime: ", "Replaces room shouting with natural Text-to-Speech calls and synthesized chimes on called tokens.")
+    ]
+    for title, desc in features:
+        pdf.set_font('helvetica', 'B', 11)
+        pdf.set_text_color(71, 85, 105)
+        pdf.write(6, title)
+        pdf.set_font('helvetica', '', 11)
+        pdf.set_text_color(15, 23, 42)
+        pdf.write(6, desc + "\n")
     pdf.ln(5)
     
-    # Section 3: Tech Stack & System Architecture
+    # ==================== PAGE 2 ====================
+    pdf.add_page()
+    
+    # Section 3: Interface Overview - Receptionist Console
     pdf.set_font('helvetica', 'B', 14)
     pdf.set_text_color(15, 118, 110)
-    pdf.cell(0, 10, '3. Technical Stack & Implementation', ln=1)
+    pdf.cell(0, 10, '3. Interface Overview & Screenshots', ln=1)
+    
+    pdf.set_font('helvetica', 'B', 12)
+    pdf.set_text_color(71, 85, 105)
+    pdf.cell(0, 8, 'A. Receptionist Console', ln=1)
+    
+    pdf.set_font('helvetica', '', 11)
+    pdf.set_text_color(15, 23, 42)
+    receptionist_desc = (
+        "The Receptionist Console is designed for extreme operational speed. It features a simplified "
+        "single-field patient intake form on the left, a centrally placed doctor controller (for Calling, "
+        "Recalling, or marking No-Show), and a real-time list directory on the right enabling on-the-fly "
+        "reordering and patient cancellation."
+    )
+    pdf.multi_cell(0, 6, receptionist_desc)
+    pdf.ln(5)
+    
+    # Embed Receptionist Screenshot
+    receptionist_img = r"C:\Users\Parth\Desktop\receptionist_screenshot.png"
+    pdf.image(receptionist_img, x=20, y=pdf.get_y(), w=170)
+    
+    # ==================== PAGE 3 ====================
+    pdf.add_page()
+    
+    # Section 3 (Continued) - Patient Waiting Room
+    pdf.set_font('helvetica', 'B', 12)
+    pdf.set_text_color(71, 85, 105)
+    pdf.cell(0, 8, 'B. Patient waiting room display', ln=1)
+    
+    pdf.set_font('helvetica', '', 11)
+    pdf.set_text_color(15, 23, 42)
+    patient_desc = (
+        "The Patient Dashboard serves both as a public monitor and a personal assistant. It includes a "
+        "highly visible 'Now Serving' banner at the top, a list of upcoming waiting tokens, and a "
+        "Personal Status Tracker card at the bottom. By selecting their token, a patient sees their "
+        "exact position in line, a visual stepper (In Queue -> Next Up -> In Cabin), and a clock-based "
+        "appointment estimate."
+    )
+    pdf.multi_cell(0, 6, patient_desc)
+    pdf.ln(5)
+    
+    # Embed Patient Screenshot
+    patient_img = r"C:\Users\Parth\Desktop\patient_screenshot.png"
+    pdf.image(patient_img, x=20, y=pdf.get_y(), w=170)
+    
+    pdf.set_y(pdf.get_y() + 85) # Offset for image height
+    pdf.ln(5)
+    
+    # Section 4: Tech Stack
+    pdf.set_font('helvetica', 'B', 14)
+    pdf.set_text_color(15, 118, 110)
+    pdf.cell(0, 10, '4. Technical Stack & Implementation', ln=1)
     
     pdf.set_font('helvetica', '', 11)
     pdf.set_text_color(15, 23, 42)
     tech_text = (
-        "The system is built on a clean, modern, zero-dependency Node.js and Express foundation. "
-        "Bidirectional WebSocket connections (Socket.io) enable real-time messaging, ensuring "
-        "immediate screen synchronization. The user interface uses a responsive vanilla CSS design system "
-        "incorporating premium Outfit typography and glassmorphism. Personalization cards store selected "
-        "token references in browser localStorage, allowing users to refresh their screens without "
-        "losing their tracking state."
+        "Built on a Node.js and Express foundation, the system uses Socket.io to establish "
+        "persistent WebSockets. Updates are broadcast in real-time, syncing both views without "
+        "requiring page refreshes. LocalStorage is utilized to persist the patient's selected token "
+        "across reloads. Audio callouts leverage native browser Web Audio and SpeechSynthesis APIs."
     )
     pdf.multi_cell(0, 6, tech_text)
     pdf.ln(5)
     
-    # Section 4: What we would do differently
+    # Section 5: Future Changes
     pdf.set_font('helvetica', 'B', 14)
     pdf.set_text_color(15, 118, 110)
-    pdf.cell(0, 10, '4. Future Roadmap & Self-Awareness', ln=1)
+    pdf.cell(0, 10, '5. Future Roadmap', ln=1)
     
     pdf.set_font('helvetica', '', 11)
     pdf.set_text_color(15, 23, 42)
     diff_text = (
-        "In the next iteration, we would add SMS alerts (using Twilio) to text patients when their turn "
-        "is 2 slots away, allowing them to wait outside in nearby shops or cafes rather than inside "
-        "the waiting room. We would also implement printed/generated QR codes on receipts, so patients "
-        "can scan to instantly launch their tracking dashboard on their phones without selects."
+        "Next iterations will support SMS alerts (via Twilio) when a patient is within 2 slots of "
+        "being called, allowing them to wait off-site. We will also incorporate a QR code generator, "
+        "printing a unique QR code on token receipts to instantly open the tracking page on the patient's phone."
     )
     pdf.multi_cell(0, 6, diff_text)
-    pdf.ln(5)
     
-    # Save PDF to Desktop
+    # Save PDF
     output_path = r"C:\Users\Parth\Desktop\Queue_Cure_Case_Study.pdf"
     pdf.output(output_path)
-    print(f"Success! Case study PDF generated at: {output_path}")
+    print(f"Success! Case study PDF with screenshots generated at: {output_path}")
 
 if __name__ == '__main__':
     create_case_study()
